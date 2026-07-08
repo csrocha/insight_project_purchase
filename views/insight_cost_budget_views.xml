@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_insight_cost_budget_list_inherit_purchase" model="ir.ui.view">
+        <field name="name">insight.cost.budget.list.inherit.purchase</field>
+        <field name="model">insight.cost.budget</field>
+        <field name="inherit_id" ref="insight_project.view_insight_cost_budget_list"/>
+        <field name="arch" type="xml">
+            <field name="skill_ids" position="after">
+                <field name="purchase_id"/>
+            </field>
+            <field name="currency_id" position="after">
+                <field name="coverage_state" widget="badge"
+                       decoration-success="coverage_state == 'purchased'"
+                       decoration-info="coverage_state == 'quoted'"
+                       decoration-muted="coverage_state == 'estimated'"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_insight_cost_budget_form_inherit_purchase" model="ir.ui.view">
+        <field name="name">insight.cost.budget.form.inherit.purchase</field>
+        <field name="model">insight.cost.budget</field>
+        <field name="inherit_id" ref="insight_project.view_insight_cost_budget_form"/>
+        <field name="arch" type="xml">
+            <field name="skill_ids" position="after">
+                <field name="purchase_id"/>
+            </field>
+            <field name="currency_id" position="after">
+                <field name="coverage_state" widget="badge"
+                       decoration-success="coverage_state == 'purchased'"
+                       decoration-info="coverage_state == 'quoted'"
+                       decoration-muted="coverage_state == 'estimated'"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="project_project_view_form_inherit_insight_purchase" model="ir.ui.view">
+        <field name="name">project.project.form.inherit.insight_project_purchase</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="insight_project.project_project_view_form_inherit_insight"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='cost_budget_ids']/tree/field[@name='skill_ids']" position="after">
+                <field name="purchase_id"/>
+            </xpath>
+            <xpath expr="//field[@name='cost_budget_ids']/tree/field[@name='currency_id']" position="after">
+                <field name="coverage_state" widget="badge"
+                       decoration-success="coverage_state == 'purchased'"
+                       decoration-info="coverage_state == 'quoted'"
+                       decoration-muted="coverage_state == 'estimated'"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_insight_scenario_list_inherit_purchase" model="ir.ui.view">
+        <field name="name">insight.scenario.list.inherit.purchase</field>
+        <field name="model">insight.scenario</field>
+        <field name="inherit_id" ref="insight_project.view_insight_scenario_list"/>
+        <field name="arch" type="xml">
+            <field name="grand_total_cost" position="after">
+                <field name="secured_extra_cost"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_insight_scenario_form_inherit_purchase" model="ir.ui.view">
+        <field name="name">insight.scenario.form.inherit.purchase</field>
+        <field name="model">insight.scenario</field>
+        <field name="inherit_id" ref="insight_project.view_insight_scenario_form"/>
+        <field name="arch" type="xml">
+            <field name="grand_total_cost" position="after">
+                <field name="secured_extra_cost" readonly="1"/>
+            </field>
+        </field>
+    </record>
+</odoo>
