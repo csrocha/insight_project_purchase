@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from odoo import api, fields, models
+from odoo import _, api, fields, models
+from odoo.exceptions import ValidationError
 
 
 class InsightCostBudget(models.Model):
@@ -10,7 +11,14 @@ class InsightCostBudget(models.Model):
         domain="[('product_id', '=', product_id)]",
         help='Línea de compra real que respalda este costo. Vacío = estimación manual.',
     )
-    amount = fields.Monetary(compute='_compute_amount_from_purchase', store=True, readonly=False)
+    # required=False: a diferencia de insight_project (100% manual), acá el
+    # monto puede llegar solo del compute cuando hay purchase_id — la
+    # obligatoriedad de "algún monto, de una forma u otra" la impone el
+    # constrains de abajo, no el required del campo (si no, Odoo intenta
+    # insertar NULL antes de correr el compute y explota la constraint).
+    amount = fields.Monetary(
+        compute='_compute_amount_from_purchase', store=True, readonly=False, required=False,
+    )
     coverage_state = fields.Selection(
         [
             ('estimated', 'Estimado'),
@@ -42,3 +50,11 @@ class InsightCostBudget(models.Model):
                 budget.coverage_state = 'purchased'
             else:
                 budget.coverage_state = 'quoted'
+
+    @api.constrains('amount', 'purchase_id')
+    def _check_amount_or_purchase(self):
+        for budget in self:
+            if not budget.purchase_id and not budget.amount:
+                raise ValidationError(_(
+                    'Ingresá un monto manual o vinculá una línea de compra en "%s".'
+                ) % budget.product_id.display_name)

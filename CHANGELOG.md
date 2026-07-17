@@ -10,6 +10,39 @@ formato que `insight_project`).
 
 ---
 
+## [17.0.1.0.1] - 2026-07-08
+
+### Prompt
+
+> Deployá addons/insight_project_purchase.
+
+Al revisar el estado del repo antes del release apareció un cambio en
+`models/insight_cost_budget.py` sin commitear del trabajo previo al scaffold
+inicial (17.0.1.0.0): se decidió incluirlo en este release en vez de
+dejarlo pendiente.
+
+### Discusión de diseño
+
+- **`amount` no puede ser `required=True` a nivel de campo**: al ser un
+  campo `compute` con `store=True` y `readonly=False`, Odoo intenta
+  insertar el registro con `amount=NULL` antes de correr el compute
+  cuando no hay `purchase_id` (caso de estimación 100% manual); con
+  `required=True` esa inserción intermedia viola la constraint antes de
+  que el compute tenga chance de correr. Se cambió a `required=False`.
+- **La obligatoriedad real se mueve a un `@api.constrains`**: en vez del
+  `required` del campo, `_check_amount_or_purchase` valida que exista
+  *algún* monto — manual o vía `purchase_id` — al guardar. Mantiene la
+  regla de negocio ("todo costo necesita un monto de alguna forma") sin
+  bloquear el flujo de estimación manual que sí soporta el módulo base
+  `insight_project`.
+
+### Corregido
+
+- `models/insight_cost_budget.py`: campo `amount` cambiado a
+  `required=False` (evita el error de inserción con NULL antes del
+  compute); agregado `_check_amount_or_purchase` (`@api.constrains`) para
+  exigir monto manual o línea de compra vinculada.
+
 ## [17.0.1.0.0] - 2026-07-08
 
 ### Prompt
