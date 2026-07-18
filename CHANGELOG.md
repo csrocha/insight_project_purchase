@@ -10,6 +10,33 @@ formato que `insight_project`).
 
 ---
 
+## [17.0.1.0.2] - 2026-07-18
+
+### Prompt
+
+> Épica 6 (deuda técnica) del roadmap de ecosistema: hook de cancelación
+> simétrico a `button_approve`.
+
+### Agregado
+
+- `PurchaseOrder.button_cancel()`: hook simétrico a `button_approve()`.
+  Captura las órdenes en `('purchase', 'done')` antes de cancelar y, tras
+  `super().button_cancel()`, reusa `_notify_insight_cost_budgets` (ahora
+  con flag `cancelled=True`) en vez de duplicar la lógica de agrupar por
+  proyecto.
+- `ProjectProject._post_purchase_cancelled_message`: mensaje de chatter
+  simétrico a `_post_purchase_confirmed_message`, más recálculo de
+  `_apply_selection_strategy()` cuando la estrategia es automática.
+
+### Discusión de diseño
+
+- `coverage_state` no se tocó — ya se recalculaba solo vía compute sobre
+  `purchase_id.state`. El gap real era solo de visibilidad (chatter) y de
+  reevaluación de la estrategia de selección, no de dato.
+- Módulo sin tests automatizados propios; verificado que sigue
+  instalando limpio (`make test-local MODULE=insight_project_purchase`,
+  0 tests/0 fallos). Falta probar el flujo en vivo cancelando una PO real.
+
 ## [17.0.1.0.1] - 2026-07-08
 
 ### Prompt

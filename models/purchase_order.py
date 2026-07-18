@@ -18,7 +18,18 @@ class PurchaseOrder(models.Model):
         self.filtered(lambda o: o.state in ('purchase', 'done'))._notify_insight_cost_budgets()
         return res
 
-    def _notify_insight_cost_budgets(self):
+    def button_cancel(self):
+        """Hook simétrico a button_approve: si se cancela una compra que ya
+        respaldaba un escenario (estaba en 'purchase'/'done'), coverage_state
+        se recalcula solo (compute sobre purchase_id.state), pero sin esto
+        nadie se entera en el chatter ni se reevalúa la estrategia de
+        selección — mismo gap que documentaba BACKLOG.md ítem 1."""
+        orders_to_notify = self.filtered(lambda o: o.state in ('purchase', 'done'))
+        res = super().button_cancel()
+        orders_to_notify._notify_insight_cost_budgets(cancelled=True)
+        return res
+
+    def _notify_insight_cost_budgets(self, cancelled=False):
         budgets = self.env['insight.cost.budget'].search([
             ('purchase_id', 'in', self.order_line.ids),
         ])
@@ -33,6 +44,9 @@ class PurchaseOrder(models.Model):
             )
             if not scenarios:
                 continue
-            project._post_purchase_confirmed_message(scenarios, project_budgets)
+            if cancelled:
+                project._post_purchase_cancelled_message(scenarios, project_budgets)
+            else:
+                project._post_purchase_confirmed_message(scenarios, project_budgets)
             if project.scenario_selection_strategy == 'automatic':
                 project._apply_selection_strategy()

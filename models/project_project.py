@@ -17,3 +17,14 @@ class ProjectProject(models.Model):
                 'automática" para que esto se refleje en el escenario base.'
             ))
         self.message_post(body=Markup('<br/>').join(lines))
+
+    def _post_purchase_cancelled_message(self, scenarios, budgets):
+        self.ensure_one()
+        lines = [_('Compra cancelada: %s.') % ', '.join(budgets.mapped('product_id.display_name'))]
+        lines.append(_('Escenarios afectados: %s.') % ', '.join(scenarios.mapped('name')))
+        if self.scenario_selection_strategy == 'manual':
+            lines.append(_(
+                'La selección de escenario está en modo manual — pasá a "Selección '
+                'automática" para que esto se refleje en el escenario base.'
+            ))
+        self.message_post(body=Markup('<br/>').join(lines))
