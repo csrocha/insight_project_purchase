@@ -11,7 +11,21 @@ formato que `insight_project/BACKLOG.md`).
 Propuesta de "nivel profesional superior" para todo el ecosistema. Visión
 completa en la memoria `project_ecosystem_roadmap`.
 
-### 1. Hook de cancelación simétrico a `button_approve`
+### ~~1. Hook de cancelación simétrico a `button_approve`~~ — RESUELTO
+
+Resuelto (2026-07-18): `button_cancel()` ahora captura las órdenes en
+`('purchase', 'done')` antes de cancelar, y tras `super().button_cancel()`
+notifica `_notify_insight_cost_budgets(cancelled=True)` — mismo patrón que
+`button_approve`, reusando el hook existente con un flag en vez de
+duplicar la lógica de agrupar por proyecto. Nuevo
+`_post_purchase_cancelled_message` en `project_project.py` (mensaje
+simétrico a `_post_purchase_confirmed_message`) y recálculo de
+`_apply_selection_strategy()` cuando la estrategia es automática. No se
+tocó `coverage_state` (ya se recalculaba solo vía compute). Verificado
+que el módulo sigue instalando limpio (`make test-local
+MODULE=insight_project_purchase`, 0 tests/0 fallos — este módulo no tiene
+tests automatizados propios); falta probar el flujo en vivo cancelando
+una PO real.
 
 `models/purchase_order.py` sobreescribe `button_approve(force=False)`
 para notificar `insight.cost.budget` cuando una compra queda
