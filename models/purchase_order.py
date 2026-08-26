@@ -39,7 +39,7 @@ class PurchaseOrder(models.Model):
         for budget in budgets:
             by_project[budget.project_id] |= budget
         for project, project_budgets in by_project.items():
-            scenarios = project.scenario_ids.filtered(
+            scenarios = project.scenario_link_ids.scenario_id.filtered(
                 lambda s: s.cost_budget_ids & project_budgets
             )
             if not scenarios:

@@ -10,6 +10,26 @@ formato que `insight_project`).
 
 ---
 
+## [17.0.1.0.3] - 2026-08-26
+
+### Prompt
+
+> (Cambio derivado de insight_project 17.0.9.8.0: "En el project insight no
+> le puedo asignar un escenario preexistente al proyecto...")
+
+### Discusión de diseño
+
+`insight_project` reemplazó el One2many `project.project.scenario_ids`
+(a `insight.scenario`) por `scenario_link_ids` (a `insight.scenario.project`),
+para poder compartir un escenario entre proyectos con `is_baseline` por
+vínculo. `purchase_order.py._notify_insight_cost_budgets` filtraba
+`project.scenario_ids` para decidir a qué escenarios avisar al confirmar/
+cancelar una compra — pasa a leer `project.scenario_link_ids.scenario_id`.
+
+### Modificado
+
+- `models/purchase_order.py`: `project.scenario_ids` → `project.scenario_link_ids.scenario_id`.
+
 ## [17.0.1.0.2] - 2026-07-18
 
 ### Prompt
